@@ -1,0 +1,68 @@
+local data = require('main.data')
+
+local product_id = {
+	['iPhone OS'] = '',
+	['Android'] = 'removeads.iap',
+}
+
+local function remove_ads()
+	print('disabling ads')
+	data.sd.ads_enabled = false
+	data.save()
+	msg.post('admob#script', 'hide_banner')
+end
+
+local function listener(self, transaction, error)
+	if error == nil then
+		pprint(transaction)
+		if transaction.state == iap.TRANS_STATE_PURCHASING then
+			print("Purchasing...")
+		elseif transaction.state == iap.TRANS_STATE_PURCHASED then
+			print("Purchased!")
+			if data.system_name == 'iPhone OS' then
+				iap.finish(transaction)
+			end
+			if transaction.ident == product_id[data.system_name] then
+				remove_ads()
+			end
+		elseif transaction.state == iap.TRANS_STATE_UNVERIFIED then
+			print("Purchase unverified!")
+		elseif transaction.state == iap.TRANS_STATE_FAILED then
+			print("Purchase failed!")
+		elseif transaction.state == iap.TRANS_STATE_RESTORED then
+			print("Purchase restored!")
+			if transaction.ident == product_id[data.system_name] then
+				remove_ads()
+			end
+		end
+	else
+		print(error.error)
+	end
+end
+
+local function purchase()
+	if product_id[data.system_name] ~= '' then
+		iap.buy(product_id[data.system_name])
+	end
+end
+
+local function restore()
+	iap.restore()
+end
+
+function init(self)
+	if data.system_name == 'iPhone OS' or data.system_name == 'Android' then
+		iap.set_listener(listener)
+	end
+end
+
+
+function on_message(self, message_id, message, sender)
+	if data.system_name == 'iPhone OS' or data.system_name == 'Android' then
+		if message_id == hash('purchase') then
+			purchase()
+		elseif message_id == hash('restore') then
+			restore()
+		end
+	end
+end

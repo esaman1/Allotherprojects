@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="postermaster.postermaker">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <activity
+            android:name="postermaster.postermaker.MainActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="postermaster.postermaker.TemplateActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="postermaster.postermaker.PosterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="postermaster.postermaker.main.CropActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="postermaster.postermaker.main.CropActivityTwo"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="postermaster.postermaker.main.PickColorImageActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="postermaster.postermaker.main.SelectImageTwoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="msl.demo.StickerGridActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="msl.textmodule.TextActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="postermaster.postermaker.ShareActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="postermaster.postermaker.creation.MyCreationActivity"
+            android:screenOrientation="portrait" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+    </application>
+</manifest>

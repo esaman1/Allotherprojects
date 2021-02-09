@@ -1,0 +1,10 @@
+local data = require('main.data')
+
+function init(self)
+	go.set('#sprite', 'tint', vmath.vector4(0, 0, 0, 0.08))
+	local scale = go.get_scale()
+	scale.x = data.screen_width / go.get('#sprite', 'size.x')
+	scale.y = 400 / go.get('#sprite', 'size.y')
+	go.set_scale(scale)
+	msg.post('player#script', 'bounds_height',  {height = go.get('#sprite', 'size.y') * scale.y})
+end

@@ -1,0 +1,149 @@
+local data = require('main.data')
+
+local function animate_in(self)
+	local ratio = data.screen_height / data.screen_width
+	local y_pos = 0
+	if ratio < 1.77 then
+		y_pos = 25
+	end
+	gui.animate(self.container, 'position.y', y_pos, gui.EASING_LINEAR, 0.3, 0, function()
+		msg.post('main:/admob#script', 'show_interstitial')
+		msg.post('.', 'acquire_input_focus')
+	end)
+end
+
+local function animate_out(self)
+	for k, v in pairs(self.buttons) do
+		gui.animate(v, 'scale', vmath.vector3(0, 0, 0), gui.EASING_LINEAR, 0.15)
+	end
+	timer.delay(0.15, false, function()
+		gui.animate(self.container, 'position.y', data.max_y, gui.EASING_LINEAR, 0.3, 0, function()
+			msg.post('main:/handler', 'show_game')
+		end)
+	end)
+end
+
+function init(self)
+	data.state = data.STATE_GAMEOVER
+	self.container = gui.get_node('container')
+	gui.set_position(self.container, vmath.vector3(0, -data.max_y, 0))
+	self.score = gui.get_node('score')
+	self.best_score = gui.get_node('best_score')
+	self.buttons = {
+		replay = gui.get_node('replay_button'),
+		share = gui.get_node('share_button'),
+		sound = gui.get_node('sound_button'),
+		rate = gui.get_node('rate_button'),
+		more = gui.get_node('more_button'),
+		remove_ads = gui.get_node('remove_ads_button')
+	}
+	local sound_texture = (data.sd.sound_on) and 'sound_on_button' or 'sound_off_button'
+	gui.play_flipbook(self.buttons.sound, sound_texture)
+	gui.set_color(self.score, data.color_two)
+	gui.set_color(self.best_score, data.color_one)
+	for k, v in pairs(self.buttons) do
+		gui.set_color(v, data.color_one)
+	end
+	animate_in(self)
+end
+
+local function resize_score_label(self)
+	local score_width = gui.get_text_metrics_from_node(self.score).width * gui.get_scale(self.score).x
+	while score_width > 300 do
+		local scale = gui.get_scale(self.score)
+		scale = vmath.vector3(scale.x - 0.1, scale.y - 0.1, scale.z - 0.1)
+		gui.set_scale(self.score, scale)
+		score_width = gui.get_text_metrics_from_node(self.score).width * scale.x
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash('final_score') then
+		self.score_value = message.final_score
+		gui.set_text(self.score, self.score_value)
+		resize_score_label(self)
+		if self.score_value > data.sd.best_score then
+			data.sd.best_score = self.score_value
+			data.save()
+			gui.set_text(self.best_score, 'NEW BEST!')
+			msg.post('main:/sound#new_best', 'play_sound')
+			local color = gui.get_color(self.best_score)
+			color.w = 0.5
+			gui.animate(self.best_score, 'color', color, gui.EASING_LINEAR, 0.5, 0, nil, gui.PLAYBACK_LOOP_PINGPONG)
+		else
+			gui.set_text(self.best_score, 'BEST '..data.sd.best_score)
+		end
+	end
+end
+
+local function animate_button(self)
+	local color = gui.get_color(self.pressed_button)
+	color.w = (color.w < 1) and 1 or 0.6
+	gui.set_color(self.pressed_button, color)
+end
+
+local function handle_button(self)
+	if self.pressed_button == self.buttons.replay then
+		msg.post('main:/sound#button', 'play_sound')
+		msg.post('.', 'release_input_focus')
+		animate_out(self)
+	elseif self.pressed_button == self.buttons.share then
+		msg.post('main:/sound#button', 'play_sound')
+		local tag = string.gsub(sys.get_config('project.title'), '%s+', '')
+		local url = (data.system_name == 'iPhone OS') and data.app_store_url or data.play_store_url
+		timer.delay(0.1, false, function()
+			local screenshot = screenshot.png()
+			local text = 'I just scored '..self.score_value..' in #'..tag..'! Download it FREE NOW! '..url
+			share.image(screenshot, text)
+		end)
+	elseif self.pressed_button == self.buttons.sound then
+		if sound.get_group_gain('master') == 1 then
+			gui.play_flipbook(self.buttons.sound, 'sound_off_button')
+			sound.set_group_gain('master', 0)
+			data.sd.sound_on = false
+			data.save()
+		else
+			gui.play_flipbook(self.buttons.sound, 'sound_on_button')
+			sound.set_group_gain('master', 1)
+			data.sd.sound_on = true
+			data.save()
+			msg.post('main:/sound#button', 'play_sound')
+		end
+	elseif self.pressed_button == self.buttons.rate then
+		msg.post('main:/sound#button', 'play_sound')
+		msg.post('.', 'release_input_focus')
+		msg.post('rate_popup#gui', 'show_popup')
+	elseif self.pressed_button == self.buttons.more then
+		msg.post('main:/sound#button', 'play_sound')
+		msg.post('.', 'release_input_focus')
+		msg.post('more_popup#gui', 'show_popup')
+	elseif self.pressed_button == self.buttons.remove_ads then
+		msg.post('main:/sound#button', 'play_sound')
+		if data.system_name == 'iPhone OS' then
+			msg.post('.', 'release_input_focus')
+			msg.post('remove_ads_popup#gui', 'show_popup')
+		else
+			msg.post('main:/iap#script', 'purchase')
+		end
+	end
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash('touch') then
+		if action.pressed then
+			for k, button in pairs(self.buttons) do
+				if gui.pick_node(button, action.x, action.y) then
+					self.pressed_button = button
+					animate_button(self)
+					break
+				end
+			end	
+		elseif action.released and self.pressed_button then
+			animate_button(self)
+			if gui.pick_node(self.pressed_button, action.x, action.y) then
+				handle_button(self)
+			end
+			self.pressed_button = nil
+		end
+	end
+end

@@ -1,0 +1,74 @@
+local data = require('main.data')
+
+local popup_shown = false
+
+local function animate_in(self)
+	go.animate('.', 'position.y', go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 0.3, 0, function()
+		msg.post('player#script', 'start')
+		msg.post('squares#script', 'spawn')
+		if data.first_game then
+			msg.post('tutorial#script', 'start')
+		else
+			msg.post('score', 'show')
+		end
+	end)
+end
+
+local function animate_out(self)
+	data.first_game = false
+	msg.post('score#script', 'fade_out')
+	msg.post('tutorial#script', 'fade_out')
+	timer.delay(0.3, false, function()
+		go.animate('.', 'position.y', go.PLAYBACK_ONCE_FORWARD, data.max_y, go.EASING_LINEAR, 0.3, 0, function()
+			msg.post('main:/handler', 'show_gameover')
+		end)
+	end)
+end
+
+function init(self)
+	data.state = data.STATE_PLAYING
+	go.set_position(vmath.vector3(0, -data.max_y, 0))
+	animate_in(self)
+end
+
+local function show_popup(self)
+	msg.post('popup#gui', 'show_popup')
+	popup_shown = true
+end
+
+local function continue_game(self)
+	msg.post('player#script', 'continue')
+	msg.post('squares#script', 'spawn')
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash('popup_result') then
+		if message.continue then
+			if data.sd.ads_enabled then
+				msg.post('main:/admob#script', 'show_rewarded_video')
+			else
+				continue_game(self)
+			end	
+		else
+			animate_out(self)
+		end
+	elseif message_id == hash('end_game') then
+		if popup_shown then
+			animate_out(self)
+		else
+			if not data.sd.ads_enabled then
+				show_popup(self)
+			else
+				msg.post('main:/admob#script', 'is_rewarded_loaded')
+			end
+		end	
+	elseif message_id == hash('rewarded_result') then
+		if message.video_loaded then
+			show_popup(self)
+		elseif message.video_complete then
+			continue_game(self)
+		elseif message.video_failed then
+			animate_out(self)
+		end
+	end	
+end

@@ -1,0 +1,94 @@
+local data = require('main.data')
+
+local active = {}
+local spawn_timer
+local counter = 0
+
+local function spawn(self)
+	counter = counter + 1
+	local random_y = math.random(1, #self.y_positions)
+	while random_y == self.last_y do
+		random_y = math.random(1, #self.y_positions)
+	end
+	local y = self.y_positions[random_y]
+	local position = vmath.vector3(self.random_x, y, 1)
+	local object = factory.create('#factory', position, nil, {
+		point = (counter == 3) and true or false,
+		speed = self.speed,
+		to_x = self.to_x
+	}, self.scale)
+	table.insert(active, object)
+	go.set_parent(object, '.')
+	local duration = data.duration(self.speed, position.x, self.to_x) / self.frequency
+	spawn_timer = timer.delay(duration, false, function()
+		spawn(self)
+	end)
+	if counter == 3 then
+		counter = 0
+	end
+	self.last_y = random_y
+end
+
+function init(self)
+	self.speed = 30
+	self.frequency = 2
+	self.scale = 1
+	local temp = factory.create('#factory', nil, nil, {temp = true})
+	local url = msg.url(nil, temp, 'sprite')
+	self.sprite_size = go.get(url, 'size')
+	self.height = self.sprite_size.y * self.scale
+	self.width = self.sprite_size.x * self.scale
+	go.delete(temp, true)
+	local random_direction = math.random(1,2)
+	self.random_x = (random_direction == 1) and data.min_x - (self.width / 2) or data.max_x + (self.width / 2)
+	self.to_x = (random_direction == 1) and data.max_x + (self.width / 2) or data.min_x - (self.width / 2)
+	self.y_positions = {}
+	for i = 1, 3 do
+		if i == 1 then 
+			self.y_positions[i] = data.mid_y - (self.height * 3) 
+		else
+			self.y_positions[i] = self.y_positions[i - 1] + (self.height * 3)
+		end
+	end
+	self.last_y = 2
+end
+
+local function increase_difficulty(self)
+	if self.speed < 40 then
+		self.speed = self.speed + 0.2
+	elseif self.speed < 45 then
+		self.speed = self.speed + 0.0025
+	end
+	if self.frequency < 3 then
+		self.frequency = self.frequency + 0.02
+	elseif self.frequency < 3.5 then
+		self.frequency = self.frequency + 0.0025
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash('spawn') then
+		counter = 0
+		spawn(self)
+	elseif message_id == hash('remove') then
+		go.delete(message.id, true)
+		for k, v in pairs(active) do
+			if v == message.id then
+				table.remove(active, k)
+				break
+			end
+		end
+	elseif message_id == hash('stop_all') then
+		timer.cancel(spawn_timer)
+		for i = #active, 1, -1 do
+			local object = active[i]
+			table.remove(active, i)
+			go.cancel_animations(object, 'position')
+			go.animate(object, 'scale', go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 0.2, 0.5, function()
+				go.delete(object, true)
+			end)
+		end
+	elseif message_id == hash('increase_difficulty') then
+		increase_difficulty(self)
+	end
+end

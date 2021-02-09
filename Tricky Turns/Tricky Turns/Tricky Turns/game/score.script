@@ -1,0 +1,32 @@
+local data = require('main.data')
+
+function init(self)
+	self.score = 0
+	go.set_scale(vmath.vector3(0.000001, 0.000001, 0.000001))
+	go.set('#label', 'color', data.color_one)
+	go.set_position(vmath.vector3(data.mid_x, data.max_y - (data.screen_height / 6), 0))
+end
+
+function final(self)
+	if data.state == data.STATE_GAMEOVER then
+		msg.post('gameover:/go#gui', 'final_score', {final_score = self.score})
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash('increase_score') then
+		self.score = self.score + 1
+		label.set_text('#label', self.score)
+		msg.post('main:/sound#point', 'play_sound')
+		if go.get_scale().x == 1 then
+			go.animate('.', 'scale', go.PLAYBACK_ONCE_PINGPONG, go.get_scale() * 1.15, go.EASING_LINEAR, 0.28)
+		end
+	elseif message_id == hash('show') then
+		if not self.faded_out then
+			go.animate('.', 'scale', go.PLAYBACK_ONCE_FORWARD, vmath.vector3(1, 1, 1), go.EASING_LINEAR, 0.15)
+		end
+	elseif message_id == hash('fade_out') then
+		go.animate('#label', 'color.w', go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 0.2)
+		self.faded_out = true
+	end	
+end

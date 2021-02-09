@@ -1,0 +1,48 @@
+images {
+  image: "/assets/images/play_button.png"
+}
+images {
+  image: "/assets/images/replay_button.png"
+}
+images {
+  image: "/assets/images/share_button.png"
+}
+images {
+  image: "/assets/images/sound_off_button.png"
+}
+images {
+  image: "/assets/images/sound_on_button.png"
+}
+images {
+  image: "/assets/images/more_button.png"
+}
+images {
+  image: "/assets/images/circle.png"
+}
+images {
+  image: "/assets/images/square.png"
+}
+images {
+  image: "/assets/images/popup_button_bottom.png"
+}
+images {
+  image: "/assets/images/popup_button_middle.png"
+}
+images {
+  image: "/assets/images/popup_button_top.png"
+}
+images {
+  image: "/assets/images/rate_button.png"
+}
+images {
+  image: "/assets/images/remove_ads_button.png"
+}
+images {
+  image: "/assets/images/star.png"
+}
+images {
+  image: "/assets/images/rect.png"
+}
+margin: 5
+extrude_borders: 0
+inner_padding: 0

@@ -1,0 +1,5 @@
+local data = require('main.data')
+
+function init(self)
+	go.set('#sprite', 'tint', data.color_one)
+end

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#4CAF50</color>
+    <color name="colorPrimaryDark">#357A38</color>
+
+<!--    <color name="colorPrimary">#03A9F4</color>-->
+<!--    <color name="colorPrimaryDark">#0098DD</color>-->
+    <color name="colorAccent">#EC407A</color>
+
+    <color name="red">#f44336</color>
+    <color name="green">#4CAF50</color>
+    <color name="background_tab_pressed">#6633b5e5</color>
+    <color name="bg_color">#ff767575</color>
+    <color name="bg_colors">#ff565656</color>
+    <color name="black">#000</color>
+    <color name="blackTransperent">#3c000000</color>
+    <color name="black_transparent2">#77000000</color>
+    <color name="colorTextLibSelected">#ffffffff</color>
+    <color name="colorTextLibWhite">#ffffffff</color>
+    <color name="colorTheme">@color/colorPrimary</color>
+    <color name="colorTrans">#00000000</color>
+    <color name="color_selected">#ff620b80</color>
+    <color name="color_theme">#ffac72bf</color>
+    <color name="color_white">#fff</color>
+    <color name="colorback">#000</color>
+    <color name="colormediam">@color/colorPrimaryDark</color>
+    <color name="colortransback">#9c7b7b7b</color>
+    <color name="white">#fff</color>
+</resources>

@@ -1,0 +1,50 @@
+local data = require('main.data')
+
+function init(self)
+	go.set('#label', 'size.x', data.screen_width * 1.5)
+	go.set('#label', 'color', data.color_one)
+	local ratio = data.screen_height / data.screen_width
+	if ratio < 1.77 then
+		go.set_position(vmath.vector3(data.mid_x, go.get_position().y + 25, 0))
+	end
+	self.text = {
+		[1] = 'TAP TO SWITCH THE ROTATION DIRECTION OF THE CIRCLES',
+		[2] = 'DODGE THE DARK SQUARES',
+		[3] = 'COLLECT THE WHITE SQUARES TO GAIN POINTS!'
+	}
+	self.tutorial_stage = 1
+end
+
+local function show_tutorial(self)
+	if not self.faded_out then
+		label.set_text('#label', self.text[self.tutorial_stage])
+		go.set('#label', 'color.w', 0)
+		go.animate('#label', 'color.w', go.PLAYBACK_ONCE_FORWARD, 1, go.EASING_LINEAR, 0.2, 0, function()
+			timer.delay(3, false, function()
+				if not self.faded_out then
+					go.animate('#label', 'color.w', go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 0.15, 0, function()
+						timer.delay(0.5, false, function()
+							if self.tutorial_stage ~= #self.text then
+								self.tutorial_stage = self.tutorial_stage + 1
+								show_tutorial(self)
+							else
+								msg.post('.', 'disable')
+								msg.post('score', 'show')
+							end
+						end)
+					end)
+				end
+			end)
+		end)
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash('start') then
+		show_tutorial(self)
+	elseif message_id == hash('fade_out') then
+		go.cancel_animations('#label', 'color.w')
+		go.animate('#label', 'color.w', go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 0.2)
+		self.faded_out = true
+	end	
+end

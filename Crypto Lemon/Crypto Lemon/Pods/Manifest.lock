@@ -1,0 +1,46 @@
+PODS:
+  - Alamofire (4.9.0)
+  - Charts (3.4.0):
+    - Charts/Core (= 3.4.0)
+  - Charts/Core (3.4.0)
+  - Realm (3.18.0):
+    - Realm/Headers (= 3.18.0)
+  - Realm/Headers (3.18.0)
+  - RealmSwift (3.18.0):
+    - Realm (= 3.18.0)
+  - RLBAlertsPickers (1.1.2)
+  - SDWebImage (5.2.3):
+    - SDWebImage/Core (= 5.2.3)
+  - SDWebImage/Core (5.2.3)
+  - SwiftKeychainWrapper (3.4.0)
+
+DEPENDENCIES:
+  - Alamofire
+  - Charts
+  - RealmSwift (~> 3.18.0)
+  - RLBAlertsPickers (~> 1.1.1)
+  - SDWebImage
+  - SwiftKeychainWrapper (~> 3.0)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - Charts
+    - Realm
+    - RealmSwift
+    - RLBAlertsPickers
+    - SDWebImage
+    - SwiftKeychainWrapper
+
+SPEC CHECKSUMS:
+  Alamofire: afc3e7c6db61476cb45cdd23fed06bad03bbc321
+  Charts: 74c9f256eaf0460c0c416522d1cf8c634ea6b286
+  Realm: 7b3d04740facf45e958a514b466a32b04f1113d6
+  RealmSwift: c817b5f374668cf08f649afb05f55d92a787649c
+  RLBAlertsPickers: 2548943b0cb16620904cbd926a645362d1b43963
+  SDWebImage: 46a7f73228f84ce80990c786e4372cf4db5875ce
+  SwiftKeychainWrapper: 6fc49fbf7d4a6b0772917acb0e53a1639f6078d6
+
+PODFILE CHECKSUM: bb2eefb9523b3869a9b49bca7025bdadbe0153d8
+
+COCOAPODS: 1.8.1

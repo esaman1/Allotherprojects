@@ -1,0 +1,169 @@
+This documentation describes how to use the VPN App source. If you modify the source or take out parts of the source this documenation might not apply fully!
+
+It doesn't matter how the OpenVPN server is authenticated as the App uses the OpenVPN protocol itself for authentication. 
+
+These parts are especially important for VPN providers:
+The app was tested to pull the .ovpn files from cPanel only, but any Web Control panel should work as long as the TLD resolves and the .htaccess allows the connection.
+
+1. Source code structure
+2. Compile the app
+3. Important parts of the source
+4. OpenVPN .ovpn file naming convention
+5. Upload .ovpn files to a Webserver
+6. Generate Server List page
+7. FAQ
+
+--------------------------------
+
+1. Source code structure
+
+/app/css - This folder should hold your website's css file or your custom css file | What to do: Add in your own CSS files or modify existing ones
+/app/flags - The flags that the app uses are here | What to do: Nothing
+/app/fonts - Special fonts the app is using | What to do: Add your own fonts if you have any
+/app/images - Images that are used within the app | What to do: Add your own images
+/app/index.html - All front-end HTML for the app is here | What to do: Change front-end the way you want
+/app/index.js - All JS is here | What to do: Change brand URL-s, change or add functions
+/app/main.js - App Configuration file | What to do: Add in app title and other config
+
+/build - Images that are used for the installer itself | What to do: Add your own images
+
+/node_modules - API files for electron | What to do: Nothing
+
+/out/win-unpacked - The unpacked version of the app so you can test without having to constantly install/reinstall (Shows up only after you compiled the app) | What to do: Test the app 
+/out/whatever.exe - Your installer (Shows up only after you compiled the app) | What to do: Test the app 
+
+/favicon.ico - Favicon | What to do: Add your own favicon
+
+/package.json - Electron Configuration file | What to do: Add in your own brandname and other metadata
+/package-lock.json - Electron Dependencies | What to do: Add in your app name and version
+
+The only important thing is that you keep the ID=classes within the index.html and index.js files to avoid any headaches!
+
+--------------------------------
+
+2. Compile the app
+
+Windows, Linux-Debian and Macos
+You have to be using the OS you want to compile for. You can't compile from one OS to another.
+For example, if you want to compile for Windows you have to do this on Windows.
+
+1. (once) Install Node.js https://nodejs.org/ then open CMD/CLI
+2. (once) Install electron-builder globally     > npm install -g electron-builder
+3. Change directory to current one              > cd /path/to/this/app
+4. Install project dependencies                 > npm install
+5. Create an installer - just type:             > electron-builder
+
+Produced installer will be located in /out directory!
+In case of any issues downgrade electron-builder.
+
+--------------------------------
+
+3. Important parts of the source
+
+Change URL to external webserver (the location where you put your .ovpn files)
+Location: /app/index.js
+
+Search for:
+function updateLocalDirectory
+
+------
+
+Change tootltip text
+Location: /app/index.js
+
+First few lines
+
+------
+
+Change tooltips altogether
+Location: /app/index.js
+
+Search for:
+function serverList_clickServer
+
+------
+
+Change what variables are passed on to the OpenVPN Protocol
+Location: /app/index.js
+
+Search for:
+function connectOpenVPN
+
+------
+
+Change ping behaviour for Faster server
+Location: /app/index.js
+
+Search for:
+function pingFastestServer
+
+------
+
+Change tooltip for Fastest server
+Location: /app/index.html
+
+Search for:
+id="server-list-span-fastest"
+
+------
+
+Disable animation in the background
+Location: /app/index.html
+
+Search for:
+class="bg-animation"
+
+--------------------------------
+
+4. OpenVPN .ovpn file naming convention
+Meaning you will have to name your ovpn files like this for it to be read correctly. (Without any changes to the app)
+
+icocountrycode.countryName.serverName.continentName.torrentEnabled.residentialEnabled.obfuscatedEnabled.ddosEnabled.version.ovpn
+
+Example:
+us.United States.New York.North America.t.r.o.d.2.ovpn
+
+This server will show as torrentEnabled.residentialEnabled.obfuscatedEnabled.ddosEnabled with the appropiate tooltip in the app.
+
+t=torrent
+r=residential
+o=obfuscated
+d=ddosenabled
+n=none
+
+Example2:
+us.United States.New York.North America.n.n.n.n.2.ovpn
+
+This server will show no tooltips in the app.
+
+Additional tooltips can be easily added to the source code.
+
+--------------------------------
+
+5. Upload .ovpn files to a Webserver
+After you renamed the .ovpn files go to the public_html file on your webserver and create a folder like "remotevpn"
+
+Upload all your .ovpn files to this folder
+
+.htaccess modification:
+
+RewriteEngine On
+RewriteRule ^remotevpn - [L]
+
+--------------------------------
+
+6. Generate Server List page
+Once you have uploaded the .ovpn files to the webserver you can generate the entire /serverlist page by going to this link (change yourdomain to your actual domain): https://yourdomain.com/_function/update
+If the naming convention is correct on the .ovpn files the script will put all servers to the /serverlist page.
+
+--------------------------------
+
+7. FAQ
+
+1. How do I access the console?
+
+In order to open the console, you should un-comment the line "mainWindow.webContents.openDevTools()" in main.js and recompile the app.
+
+2. When compiling do I have to use the path of the source itself?
+
+You have to be one dir above the /app folder.

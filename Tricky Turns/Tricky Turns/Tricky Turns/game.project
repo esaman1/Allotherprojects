@@ -1,0 +1,76 @@
+[project]
+dependencies = https://github.com/britzl/defold-screenshot/archive/master.zip,https://github.com/britzl/defold-sharing/archive/master.zip,https://github.com/subsoap/defos/archive/master.zip,https://github.com/Melsoft-Games/defold-apk_verifier/archive/master.zip,https://github.com/Lerg/extension-admob/archive/master.zip,https://github.com/defold/extension-iap/archive/master.zip,https://github.com/Lerg/android-base-extensions/releases/download/1.0.1/gps-ads-17.2.1.zip,https://github.com/defold/android-base-extensions/releases/download/1.0.0/gps-base-16.0.1.zip,https://github.com/defold/android-base-extensions/releases/download/1.0.0/support-v4-27.0.2.zip
+title = Tricky Turns
+version = 1.0.1
+
+[bootstrap]
+main_collection = /main/main.collectionc
+render = /custom/render/custom.renderc
+
+[input]
+game_binding = /input/game.input_bindingc
+use_accelerometer = 0
+
+[display]
+width = 640
+height = 1136
+
+[ios]
+app_icon_120x120 = /assets/app_icons/iOS/icon_120.png
+app_icon_180x180 = /assets/app_icons/iOS/icon_180.png
+app_icon_76x76 = /assets/app_icons/iOS/icon_76.png
+app_icon_152x152 = /assets/app_icons/iOS/icon_152.png
+app_icon_57x57 = /assets/app_icons/iOS/icon_57.png
+app_icon_114x114 = /assets/app_icons/iOS/icon_114.png
+app_icon_72x72 = /assets/app_icons/iOS/icon_72.png
+app_icon_144x144 = /assets/app_icons/iOS/icon_144.png
+launch_image_320x480 = /assets/launch_images/ios_launch_320x480.png
+launch_image_640x960 = /assets/launch_images/ios_launch_640x960.png
+launch_image_640x1136 = /assets/launch_images/ios_launch_640x1136.png
+launch_image_750x1334 = /assets/launch_images/ios_launch_750x1334.png
+launch_image_768x1024 = /assets/launch_images/ios_launch_768x1024.png
+launch_image_1536x2048 = /assets/launch_images/ios_launch_1536x2048.png
+launch_image_1024x768 = /assets/launch_images/ios_launch_1024x768.png
+launch_image_1242x2208 = /assets/launch_images/ios_launch_1242x2208.png
+launch_image_2208x1242 = /assets/launch_images/ios_launch_2208x1242.png
+launch_image_2048x1536 = /assets/launch_images/ios_launch_2048x1536.png
+bundle_identifier = com.example.todo
+app_icon_167x167 = /assets/app_icons/iOS/icon_167.png
+launch_image_2048x2732 = /assets/launch_images/ios_launch_2048x2732.png
+launch_image_2732x2048 = /assets/launch_images/ios_launch_2732x2048.png
+launch_image_1334x750 = /assets/launch_images/ios_launch_1334x750.png
+launch_image_1125x2436 = /assets/launch_images/ios_launch_1125x2436.png
+launch_image_2436x1125 = /assets/launch_images/ios_launch_2436x1125.png
+launch_image_1668x2224 = /assets/launch_images/ios_launch_1668x2224.png
+launch_image_2224x1668 = /assets/launch_images/ios_launch_2224x1668.png
+
+[osx]
+bundle_identifier = com.example.todo
+
+[android]
+app_icon_36x36 = /assets/app_icons/android/icon_36.png
+app_icon_48x48 = /assets/app_icons/android/icon_48.png
+app_icon_72x72 = /assets/app_icons/android/icon_72.png
+app_icon_96x96 = /assets/app_icons/android/icon_96.png
+app_icon_144x144 = /assets/app_icons/android/icon_144.png
+app_icon_192x192 = /assets/app_icons/android/icon_192.png
+input_method = HiddenInputField
+immersive_mode = 1
+minimum_sdk_version = 14
+target_sdk_version = 28
+package = com.shapeshift.trickyturns
+version_code = 2
+
+[script]
+shared_state = 1
+
+[physics]
+debug = 0
+
+[iap]
+auto_finish_transactions = 0
+
+[admob]
+ios_app_id = 
+android_app_id = ca-app-pub-6870384215844529~2526536312
+

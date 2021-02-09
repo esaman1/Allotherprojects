@@ -1,0 +1,80 @@
+local data = require('main.data')
+
+function init(self)
+	self.container = gui.get_node('container')
+	self.popup = gui.get_node('popup')
+	self.buttons = {}
+	self.buttons.remove_ads = {gui.get_node('b1'), gui.get_node('t1')}
+	self.buttons.restore = {gui.get_node('b2'), gui.get_node('t2')}
+	self.buttons.close = {gui.get_node('b3'), gui.get_node('t3')}
+	local size = vmath.vector3(data.screen_width, data.screen_height, 0)
+	gui.set_size(self.container, size)
+	gui.set_color(self.container, vmath.vector4(0, 0, 0, 0))
+	gui.set_color(self.buttons.remove_ads[1], data.popup_color)
+	gui.set_color(self.buttons.restore[2], data.popup_color)
+	gui.set_scale(self.popup, vmath.vector3(0, 0, 0))
+	gui.set_enabled(self.container, false)
+end
+
+local function animate_in(self)
+	gui.animate(self.container, 'color', vmath.vector4(0, 0, 0, 0.5), gui.EASING_LINEAR, 0.1)
+	gui.animate(self.popup, 'scale', vmath.vector3(1, 1, 1), gui.EASING_LINEAR, 0.2, 0, function()
+		msg.post('.', 'acquire_input_focus')
+	end)
+end
+
+local function animate_out(self)
+	gui.animate(self.container, 'color', vmath.vector4(0, 0, 0, 0), gui.EASING_LINEAR, 0.1)
+	gui.animate(self.popup, 'position.y', data.max_y / 1.5, gui.EASING_LINEAR, 0.2, 0, function()
+		gui.set_enabled(self.container, false)
+		msg.post('go', 'acquire_input_focus')
+		gui.set_scale(self.popup, vmath.vector3(0, 0, 0))
+		gui.set_position(self.popup, vmath.vector3(0, 0, 0))
+	end)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash('show_popup') then
+		gui.set_enabled(self.container, true)
+		animate_in(self)
+	end
+end
+
+local function animate_button(self)
+	local text = self.pressed_button[2]
+	local color = gui.get_color(text)
+	color.w = (color.w < 1) and 1 or 0.6
+	gui.set_color(text, color)
+end
+
+local function handle_button(self)
+	if self.pressed_button == self.buttons.remove_ads then
+		msg.post('main:/iap#script', 'purchase')
+	elseif self.pressed_button == self.buttons.restore then
+		msg.post('main:/iap#script', 'restore')
+	elseif self.pressed_button == self.buttons.close then
+		msg.post('.', 'release_input_focus')
+		animate_out(self)
+	end
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash('touch') then
+		if action.pressed then
+			for k, v in pairs(self.buttons) do
+				if gui.pick_node(v[1], action.x, action.y) then
+					self.pressed_button = v
+					animate_button(self)
+					break
+				end
+			end	
+		elseif action.released and self.pressed_button then
+			animate_button(self)
+			if gui.pick_node(self.pressed_button[1], action.x, action.y) then
+				msg.post('main:/sound#button', 'play_sound')
+				handle_button(self)
+			end
+			self.pressed_button = nil
+		end
+	end
+end

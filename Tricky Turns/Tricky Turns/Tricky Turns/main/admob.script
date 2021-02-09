@@ -1,0 +1,162 @@
+local data = require('main.data')
+
+local app_id = {
+	['iPhone OS'] = '',
+	['Android'] = 'ca-app-pub-6870384215844529~2526536312'
+}
+
+local banner_id = {
+	['iPhone OS'] = '',
+	['Android'] = 'ca-app-pub-6870384215844529/1926048318'
+}
+
+local interstitial_id = {
+	['iPhone OS'] = '',
+	['Android'] = 'ca-app-pub-6870384215844529/3947429198'
+}
+
+local rewarded_id = {
+	['iPhone OS'] = '',
+	['Android'] = 'ca-app-pub-6870384215844529/9774470945'
+}
+
+local banner_size = {
+	['iPhone OS'] = 'smart_portrait',
+	['Android'] = 'smart'
+}
+
+local test_mode = true
+local interstitial_timer = 0
+local initialized = false
+local completed_video = false
+
+local function load_banner()
+	admob.load{
+		type = 'banner',
+		id = banner_id[data.system_name],
+		size = banner_size[data.system_name],
+		position = 'bottom',
+		max_ad_content_rating = 'G',
+		keywords = {'game', 'casual', 'arcade', 'puzzle'},
+		non_personalized = true
+	}
+end
+
+local function hide_banner()
+	admob.hide_banner()
+end
+
+local function load_interstitial()
+	admob.load{
+		type = 'interstitial',
+		id = interstitial_id[data.system_name],
+		immersive = true,
+		max_ad_content_rating = 'G',
+		keywords = {'game', 'casual', 'arcade', 'puzzle'},
+		non_personalized = true
+	}
+end
+
+local function load_rewarded_video()
+	admob.load{
+		type = 'rewarded',
+		id = rewarded_id[data.system_name],
+		immersive = true,
+		max_ad_content_rating = 'G',
+		keywords = {'game', 'casual', 'arcade', 'puzzle'},
+		non_personalized = true
+	}
+end
+
+local function listener(event)
+	print('admob event type', event.type)
+	print('admob event phase', event.phase)
+
+	if event.phase == 'init' then
+		initialized = true
+		load_banner()
+		load_interstitial()
+		load_rewarded_video()
+	elseif event.type == 'interstitial' and event.phase == 'closed' then
+		load_interstitial()
+	elseif event.type == 'rewarded' then
+		if event.phase == 'rewarded' then
+			completed_video = true
+		elseif event.phase == 'closed' then
+			if completed_video then
+				msg.post('game:/container#script', 'rewarded_result', {video_complete = true})
+			else
+				msg.post('game:/container#script', 'rewarded_result', {video_failed = true})
+			end
+			load_rewarded_video()
+		end
+	end
+
+	if event.is_error then
+		print('admob event error code', event.error_code)
+		print('admob event error message', event.error_message)
+		if event.error_code == 2 then
+			initialized = false
+		end
+	end
+end
+
+function init(self)
+	if data.sd.ads_enabled then
+		admob.init{
+			app_id = app_id[data.system_name],
+			test = test_mode,
+			listener = listener
+		}
+	end
+end
+
+local function show_interstitial()
+	if data.sd.ads_enabled then
+		if not initialized then
+			admob.init{
+				app_id = app_id[data.system_name],
+				test = test_mode,
+				listener = listener
+			}
+		else
+			interstitial_timer = interstitial_timer + 1
+			if interstitial_timer == 2 then
+				if admob.is_loaded('interstitial') then
+					admob.show('interstitial')
+					interstitial_timer = 0
+				else
+					load_interstitial()
+					interstitial_timer = 1
+				end
+			end
+		end
+	end
+end
+
+local function show_rewarded_video()
+	completed_video = false
+	if admob.is_loaded('rewarded') then
+		admob.show('rewarded')
+	else
+		msg.post('game:/container#script', 'rewarded_result', {video_failed = true})
+		load_rewarded_video()
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash('show_interstitial') then
+		show_interstitial()
+	elseif message_id == hash('hide_banner') then
+		hide_banner()
+	elseif message_id == hash('is_rewarded_loaded') then
+		if admob.is_loaded('rewarded') then
+			msg.post('game:/container#script', 'rewarded_result', {video_loaded = true})
+		else
+			msg.post('game:/container#script', 'rewarded_result', {video_failed = true})
+			load_rewarded_video()
+		end
+	elseif message_id == hash('show_rewarded_video') then
+		show_rewarded_video()
+	end
+end

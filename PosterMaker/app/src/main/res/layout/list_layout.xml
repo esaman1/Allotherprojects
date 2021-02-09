@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/lay_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/btn_layControls"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="2dp"
+                android:layout_toRightOf="@+id/lay_left"
+                android:background="@drawable/layers_off"
+                android:clickable="false" />
+
+            <RelativeLayout
+                android:id="@+id/lay_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:id="@+id/lay_text"
+                    android:layout_width="160dp"
+                    android:layout_height="55dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:alpha="0.8"
+                        android:background="@color/black" />
+
+                    <TextView
+                        android:id="@+id/txt_Nolayers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/no_layers"
+                        android:textColor="@android:color/white"
+                        android:textSize="15sp" />
+                </RelativeLayout>
+
+                <com.woxthebox.draglistview.DragListView
+                    android:id="@+id/drag_list_view"
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:scrollbarThumbVertical="@drawable/scrollbar"
+                    android:scrollbars="vertical" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</FrameLayout>

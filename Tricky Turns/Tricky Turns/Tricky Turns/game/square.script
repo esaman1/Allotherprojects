@@ -1,0 +1,45 @@
+local data = require('main.data')
+
+go.property('temp', false)
+go.property('point', false)
+go.property('speed', 0)
+go.property('to_x', 0)
+
+local function move(self)
+	local position = go.get_position()
+	local duration = data.duration(self.speed, position.x, self.to_x)
+	go.animate('.', 'position.x', go.PLAYBACK_ONCE_FORWARD, self.to_x, go.EASING_LINEAR, duration, 0, function()
+		go.cancel_animations('.', 'position')
+		msg.post('squares#script', 'remove', {id = go.get_id()})
+	end)
+end
+
+function init(self)
+	if not self.temp then
+		if self.point then
+			sprite.set_constant('#sprite', 'tint', data.color_one)
+		else
+			sprite.set_constant('#sprite', 'tint', data.color_two)
+		end
+		move(self)
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash('trigger_response') and message.enter then
+		if message.group == hash('player') then
+			if self.point then
+				msg.post('#collisionobject', 'disable')
+				msg.post('score#script', 'increase_score')
+				msg.post('squares#script', 'increase_difficulty')
+				msg.post('player#script', 'increase_difficulty')
+				go.animate('#sprite', 'scale', go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 0.15, 0, function()
+					msg.post('squares#script', 'remove', {id = go.get_id()})
+				end)
+			else
+				msg.post('player#script', 'collision')
+				msg.post('squares#script', 'stop_all')
+			end
+		end
+	end	
+end

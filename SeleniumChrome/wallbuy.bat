@@ -1,0 +1,1 @@
+@py.exe C:\Users\ahame\Downloads\Coding\SeleniumChrome\wallbuy.py %*
